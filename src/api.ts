@@ -36,7 +36,7 @@ function api() {
 
 export async function login(email: string, password: string) {
   const res = await axios.post(`${getBaseUrl()}/auth/login`, { email, password })
-  const { token, user } = res.data.data
+  const { token, user } = res.data
   localStorage.setItem('token', token)
   localStorage.setItem('user', JSON.stringify(user))
   return user
