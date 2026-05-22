@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "https://api.foodlens.cloud",
+        target: "https://api.foodlens.cloud:4000",
         changeOrigin: true,
         secure: false,
       },
