@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "http://api.foodlens.cloud:4000/api/:path*"
+      "destination": "https://api.foodlens.cloud/api/:path*"
     }
   ]
 }

@@ -5,10 +5,9 @@ import vue from "@vitejs/plugin-vue";
 export default defineConfig({
   plugins: [vue()],
   server: {
-    port: 5177,
     proxy: {
       "/api": {
-        target: "http://api.foodlens.cloud:4000",
+        target: "https://api.foodlens.cloud",
         changeOrigin: true,
         secure: false,
       },
