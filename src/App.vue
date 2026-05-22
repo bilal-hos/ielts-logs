@@ -270,10 +270,6 @@ const loginForm = ref({ email: "", password: "" });
 const loginError = ref("");
 const loggingIn = ref(false);
 
-function saveServerUrl() {
-  setBaseUrl(serverUrl.value);
-}
-
 async function doLogin() {
   if (!serverUrl.value) {
     loginError.value = "Enter server URL first";
