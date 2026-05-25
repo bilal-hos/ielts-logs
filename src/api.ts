@@ -1,28 +1,15 @@
 import axios from "axios";
-import type { LogsResponse, StatsResponse, Filters } from "./types";
+import type { LogsResponse, StatsResponse, Filters, Teacher, Student, AdminStats, DashboardStats } from "./types";
 
-const FALLBACK_URL =
-  import.meta.env.VITE_API_BASE_URL || "https://api.foodlens.cloud/api";
+const ENV_URL = (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(/\/$/, "");
+const FALLBACK_URL = ENV_URL || "https://api.foodlens.cloud/api";
 
 export function getBaseUrl(): string {
+  // Env var always wins — avoids stale localStorage overriding dev/prod config
+  if (ENV_URL) return ENV_URL;
+
   const stored = localStorage.getItem("apiBaseUrl");
-
-  // Sanitize stale URLs: strip http:// and any explicit port
-  if (stored) {
-    const isHttp = stored.startsWith("http://");
-    const hasPort = /:\d+/.test(
-      stored.replace("https://", "").replace("http://", ""),
-    );
-
-    if (isHttp || hasPort) {
-      // Overwrite with the correct URL and use it
-      const clean = FALLBACK_URL;
-      localStorage.setItem("apiBaseUrl", clean);
-      return clean;
-    }
-
-    return stored;
-  }
+  if (stored) return stored;
 
   return FALLBACK_URL;
 }
@@ -61,10 +48,7 @@ function api() {
 }
 
 export async function login(email: string, password: string) {
-  const res = await axios.post(`${getBaseUrl()}/auth/login`, {
-    email,
-    password,
-  });
+  const res = await axios.post(`${getBaseUrl()}/auth/login`, { email, password });
   const { token, user } = res.data;
   localStorage.setItem("token", token);
   localStorage.setItem("user", JSON.stringify(user));
@@ -92,5 +76,40 @@ export async function fetchLogs(
 
 export async function fetchStats(): Promise<StatsResponse> {
   const res = await api().get("/logs/statistics");
+  return res.data;
+}
+
+export async function fetchAdminStats(): Promise<{ success: boolean; data: AdminStats }> {
+  const res = await api().get("/admin/stats");
+  return res.data;
+}
+
+export async function fetchDashboardStats(): Promise<{ success: boolean; data: DashboardStats }> {
+  const res = await api().get("/admin/dashboard");
+  return res.data;
+}
+
+export async function fetchTeachers(): Promise<{ success: boolean; count: number; data: Teacher[] }> {
+  const res = await api().get("/admin/teachers");
+  return res.data;
+}
+
+export async function createTeacher(payload: {
+  name: string;
+  surName?: string;
+  email: string;
+  password: string;
+  bio?: string;
+}): Promise<{ success: boolean; data: Teacher }> {
+  const res = await api().post("/admin/teacher", payload);
+  return res.data;
+}
+
+export async function deleteTeacher(id: string): Promise<void> {
+  await api().delete(`/admin/teacher/${id}`);
+}
+
+export async function fetchStudents(): Promise<{ success: boolean; count: number; data: Student[] }> {
+  const res = await api().get("/admin/students");
   return res.data;
 }
